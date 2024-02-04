@@ -1,0 +1,73 @@
+#!/bin/bash
+
+ask_reboot() {
+	clear
+	read -p "[?] Would you like to reboot? [y/n]: " reboot
+
+	if [ $reboot == "y" ]; then
+		clear
+		echo -e "\n[+] Rebooting\n"
+		reboot
+	else
+		clear
+		echo -e "\n[+] Box is set\n"
+		exit 0
+	fi
+}
+
+update_system() {
+	sys=$(cat /etc/os-release | head -n 1 | cut -d '"' -f 2)
+	curr_date=$(date)
+
+	clear
+	echo -e "[+] Checking if script ran\n"
+	apt-get purge python3-venv -y 2>&1 >/dev/null
+
+	clear
+	echo -e "$curr_date\n[SYSTEM] $sys\n"
+	echo -e "\n[+] Automating process\n"
+	apt-get update; apt-get upgrade -y; apt-get full-upgrade -y; apt-get dist-upgrade -y; apt-get autoremove -y; apt-get autoclean -y
+
+	clear
+	read -p "[?] Install software? [y/n]: " software
+
+	if [ $software == "y" ]; then
+		clear
+		echo -e "\n[+] Installing software\n"
+		apt-get install git wget curl net-tools bridge-utils dnsutils python3 python3-pip python3-venv sudo zsh -y
+
+		clear
+		read -p "[?] Would you like to add a user? [y/n]: " user
+
+		if [ $user == "y" ]; then
+			clear
+			read -p "[?] Enter username: " USER
+			clear
+			echo -e "\n[+] Adding user\n"
+			useradd -s /bin/bash -m $USER
+			passwd $USER
+			usermod -aG sudo $username
+			ask_reboot
+		else
+			ask_reboot
+		fi
+	else
+		clear
+		read -p "[?] Would you like to add a user? [y/n]: " user
+
+		if [ $user == "y" ]; then
+			clear
+			read -p "[?] Enter username: " USER
+			clear
+			echo -e "\n[+] Adding user\n"
+			useradd -s /bin/bash -m $USER
+			passwd $USER
+			usermod -aG sudo $username
+			ask_reboot
+		else
+			ask_reboot
+		fi
+	fi
+}
+
+time update_system
