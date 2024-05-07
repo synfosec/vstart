@@ -1,0 +1,161 @@
+#!/bin/bash
+
+initMessage() {
+	clear; echo -e "\nTHIS IS A PERSONAL SCRIPT! THIS WILL NOT WORK ON ALL LINUX SYSTEMS\n"
+	sleep 3
+}
+
+ask_reboot() {
+	clear
+	read -p "[?] Would you like to reboot? [y/n]: " reboot
+
+	if [ $reboot == "y" ]; then
+		clear
+		echo -e "\n[*] Rebooting\n"
+		reboot
+	else
+		clear
+		echo -e "\n[+] Box is set\n"
+		exit 0
+	fi
+}
+
+get_neovim() {
+	echo -e "[*] Pulling vim"
+	wget -q "https://github.com/neovim/neovim/releases/download/v0.9.5/nvim.appimage"
+	chmod +x nvim.appimage
+	echo -e "[*] Building vim"
+	./nvim.appimage --appimage-extract 2>&1 >/dev/null
+	rm nvim.appimage
+	mv squashfs-root neovim
+	sudo mv neovim /opt
+	echo -e "[*] Installing vim"
+	sudo ln -s /opt/neovim/usr/bin/nvim /usr/local/bin
+	echo -e "[*] Installing dependencies"
+	npm install -g npm@latest 2>&1 >/dev/null
+	npm install -g yarn@latest 2>&1 >/dev/null
+	echo "[+] Vim installed!"
+}
+
+get_go() {
+	echo -e "[*] Downloading Golang"
+	wget -q "https://go.dev/dl/go1.22.2.linux-amd64.tar.gz"
+	tar -xzf go1.22.2.linux-amd64.tar.gz
+	echo "[*] Installing Golang"
+	mv go /opt
+	ln -s /opt/go/bin/go /usr/local/bin
+	echo "[*] Go installed!"
+}
+
+make_tools() {
+	echo "[*] Downloading Tools"
+	mkdir /home/$1/Tools
+	cd /home/$1/Tools
+	git clone --quiet --recursive https://github.com/epi052/feroxbuster.git
+	echo "[+] downloaded feroxbuster - DISCOVERY BRUTEFORCE"
+	git clone --quiet --recursive https://github.com/RustScan/RustScan.git
+	echo "[+] downloaded rustscan - PORT SCANNER"
+	git clone --quiet --recursive https://github.com/owasp-amass/amass.git
+	echo "[+] downloaded amass - DOMAIN OSINT"
+	git clone --quiet --recursive https://github.com/justakazh/sicat.git
+	echo "[+] downloaded sicat - EXPLOIT SEARCH"
+	git clone --quiet --recursive https://github.com/OWASP/ZSC.git
+	echo "[+] downloaded zsc - SHELLCODING"
+	git clone --quiet --recursive https://github.com/pwndbg/pwndbg.git
+	echo "[+] downloaded pwndbg - LINUX DEBUGGING"
+	echo "[!] Downloading the SecLists. This may take a moment"
+	git clone --quiet --recursive https://github.com/danielmiessler/SecLists.git
+	echo "[+] downloaded seclists - LIST OF PASSWORDS AND FUZZING"
+	git clone --quiet --recursive https://github.com/sherlock-project/sherlock.git
+	echo "[+] downloaded sherlock - SOCIAL MEDIA OSINT"
+	git clone --quiet --recursive https://github.com/Mebus/cupp.git
+	echo "[+] downloaded cupp - LIST GENERATOR"
+	git clone --quiet --recursive https://github.com/trustedsec/social-engineer-toolkit.git
+	echo "[+] downloaded setoolkit - SOCIAL ENGINEERING TOOLKIT"
+	git clone --quiet --recursive https://github.com/lanmaster53/recon-ng.git
+	echo "[+] downloaded reconng - RECON FRAMEWORK"
+
+	chown -R $1:$1 *
+}
+
+update_system() {
+	initMessage
+	sys=$(cat /etc/os-release | head -n 1 | cut -d '"' -f 2)
+	curr_date=$(date)
+
+	clear
+	echo -e "[i] Checking if script ran\n"
+	apt-get purge nodejs npm nmap docker.io docker-compose hydra hashcat john python3-virtualenv zsh -y 2>&1 >/dev/null\
+	rm -rf /home/*
+
+	clear
+	echo -e "$curr_date\n[SYSTEM] $sys\n"
+	echo -e "\n[*] Automating process"
+	sleep 1
+	echo -e "[*] Updating system\n"
+	apt-get update -y; apt-get upgrade -y; apt-get full-upgrade -y; apt-get dist-upgrade -y; apt-get autoremove -y; apt-get autoclean -y 2>&1 >/dev/null
+
+	clear
+	read -p "[?] Install software? [y/n]: " software
+
+	if [ $software == "y" ]; then
+		clear
+		echo -e "[*] Installing software\n"
+		apt-get install git wget curl net-tools bridge-utils dnsutils python3 python3-pip python3-virtualenv sudo zsh xclip xsel nodejs npm nmap docker.io docker-compose hydra hashcat john gcc gdb -y 2>&1 >/dev/null
+
+		clear
+		read -p "[?] Would you like to add a user? [y/n]: " user
+
+		if [ $user == "y" ]; then
+			clear
+			read -p "[?] Enter username: " USER
+			clear
+			echo -e "\n[+] Adding user\n"
+			useradd -s /bin/bash -m $USER
+			passwd $USER
+			mkdir /home/$USER/.ssh
+			wget -q "https://github.com/synfosec/vstart/blob/main/scripts/userconfig.sh"; mv userconfig.sh /home/$USER
+			chown $USER:$USER /home/$USER/userconfig.sh; chmod +x $USER:$USER /home/$USER/userconfig.sh
+			clear
+
+			read -p "[?] Would you like to install third party tools? [y/n]: " neovimer
+			clear
+
+			if [ $neovimer == "y" ]; then
+				get_neovim $USER
+				get_go
+				make_tools $USER
+				wget -q "https://raw.githubusercontent.com/synfosec/vstart/main/scripts/userconfig.sh" -O /home/$USER/userconfig.sh
+				ask_reboot
+			else
+				ask_reboot
+			fi
+		else
+			wget -q "https://raw.githubusercontent.com/synfosec/vstart/main/scripts/userconfig.sh" -O /home/$USER/userconfig.sh
+			ask_reboot
+		fi
+	else
+		clear
+		read -p "[?] Would you like to add a user? [y/n]: " user
+
+		if [ $user == "y" ]; then
+			clear
+			read -p "[?] Enter username: " USER
+			clear
+			echo -e "[*] Adding user\n"
+			sudo useradd -s /bin/bash -m $USER
+			passwd $USER
+			ask_reboot
+		else
+			if [ $neovimer == "y" ]; then
+				get_neovim $USER
+				get_go
+				ask_reboot
+			else
+				ask_reboot
+			fi
+		fi
+	fi
+}
+
+time update_system
