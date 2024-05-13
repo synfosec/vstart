@@ -21,6 +21,12 @@ ask_reboot() {
 }
 
 get_neovim() {
+	wget -q "https://nodejs.org/dist/v22.1.0/node-v22.1.0-linux-x64.tar.xz"
+	tar -xf node-v22.1.0-linux-x64.tar.xz
+	mv node-v22.1.0-linux-x64 node
+	mv node /opt
+	ln -s /opt/node/bin/node /usr/local/bin
+	ln -s /opt/node/bin/npm /usr/local/bin
 	echo -e "[*] Pulling vim"
 	wget -q "https://github.com/neovim/neovim/releases/download/v0.9.5/nvim.appimage"
 	chmod +x nvim.appimage
@@ -101,7 +107,7 @@ update_system() {
 	if [ $software == "y" ]; then
 		clear
 		echo -e "[*] Installing software\n"
-		apt-get install git wget curl net-tools bridge-utils dnsutils python3 python3-pip python3-virtualenv sudo zsh xclip xsel nodejs npm nmap docker.io docker-compose hydra hashcat john gcc gdb -y 2>&1 >/dev/null
+		apt-get install git wget curl net-tools bridge-utils dnsutils python3 python3-pip python3-virtualenv sudo zsh xclip xsel nmap docker.io docker-compose hydra hashcat john gcc gdb -y 2>&1 >/dev/null
 
 		clear
 		read -p "[?] Would you like to add a user? [y/n]: " user

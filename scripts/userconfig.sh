@@ -65,6 +65,25 @@ get_meta() {
     echo "[+] downloaded metasploit - PENTESTING FRAMEWORK"
 }
 
+get_goPro() {
+	clear
+	echo "[*] Downloading Go Tools"
+	go install -v github.com/tomnomnom/assetfinder@latest 2>&1>/dev/null
+    echo "[+] downloaded assetfinder - SUBDOMAIN ENUMERATION"
+	go install -v github.com/tomnomnom/httprobe@latest 2>&1>/dev/null
+    echo "[+] downloaded httprobe - PROBING TLD FOR HTTP/HTTPS"
+	go install -v github.com/tomnomnom/waybackurls@latest 2>&1>/dev/null
+    echo "[+] downloaded waybackurls - WAYBACK MACHINE URL ENUMERATION"
+	go install -v github.com/tomnomnom/gf@latest 2>&1>/dev/null
+    echo "[+] downloaded gf - GREP FOR FILES"
+	go install -v github.com/tomnomnom/fff@latest 2>&1>/dev/null
+    echo "[+] downloaded fff - FIND FILES"
+	go install -v github.com/tomnomnom/anew@latest 2>&1>/dev/null
+    echo "[+] downloaded anew - FILTER LINES"
+	go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest 2>&1>/dev/null
+	echo "[+] downloaded nuclei - VULNERABILITY SCANNER"
+}
+
 # INIT
 ssh_message
 clear
@@ -72,3 +91,4 @@ get_rust
 get_ohMyZsh
 setGit
 get_meta
+get_goPro
