@@ -40,6 +40,7 @@ get_neovim() {
 	echo -e "[*] Installing dependencies"
 	npm install -g npm@latest 2>&1 >/dev/null
 	npm install -g yarn@latest 2>&1 >/dev/null
+	ln -s /opt/node/bin/yarn /usr/local/bin
 	echo "[+] Vim installed!"
 }
 
@@ -80,6 +81,8 @@ make_tools() {
 	echo "[+] downloaded setoolkit - SOCIAL ENGINEERING TOOLKIT"
 	git clone --quiet --recursive https://github.com/lanmaster53/recon-ng.git
 	echo "[+] downloaded reconng - RECON FRAMEWORK"
+	git clone --quiet --recursive https://github.com/SofianeHamlaoui/Spike-Fuzzer.git
+	echo "[+] downloaded spike - FUZZING TOOL"
 
 	chown -R $1:$1 *
 }
