@@ -2,7 +2,7 @@
 
 initMessage() {
 	clear; echo -e "\nTHIS IS A PERSONAL SCRIPT! THIS WILL NOT WORK ON ALL LINUX SYSTEMS\n"
-	sleep 3
+	sleep 2
 }
 
 ask_reboot() {
@@ -22,13 +22,14 @@ ask_reboot() {
 
 get_neovim() {
 	wget -q "https://nodejs.org/dist/v22.1.0/node-v22.1.0-linux-x64.tar.xz"
-	tar -xf node-v22.1.0-linux-x64.tar.xz
-	mv node-v22.1.0-linux-x64 node
+	wget -q "https://nodejs.org/dist/v22.2.0/node-v22.2.0-linux-x64.tar.xz"
+	tar -xf node-v22.2.0-linux-x64.tar.xz
+	mv node-v22.2.0-linux-x64 node
 	mv node /opt
 	ln -s /opt/node/bin/node /usr/local/bin
 	ln -s /opt/node/bin/npm /usr/local/bin
 	echo -e "[*] Pulling vim"
-	wget -q "https://github.com/neovim/neovim/releases/download/v0.9.5/nvim.appimage"
+	wget -q "https://github.com/neovim/neovim/releases/download/v0.10.0/nvim.appimage"
 	chmod +x nvim.appimage
 	echo -e "[*] Building vim"
 	./nvim.appimage --appimage-extract 2>&1 >/dev/null
@@ -45,10 +46,10 @@ get_neovim() {
 }
 
 get_go() {
-	echo -e "[*] Downloading Golang"
+	echo -e "[*] Downloading go"
 	wget -q "https://go.dev/dl/go1.22.2.linux-amd64.tar.gz"
 	tar -xzf go1.22.2.linux-amd64.tar.gz
-	echo "[*] Installing Golang"
+	echo "[*] Installing go"
 	mv go /opt
 	ln -s /opt/go/bin/go /usr/local/bin
 	echo "[*] Go installed!"
@@ -64,13 +65,11 @@ make_tools() {
 	echo "[+] downloaded rustscan - PORT SCANNER"
 	git clone --quiet --recursive https://github.com/owasp-amass/amass.git
 	echo "[+] downloaded amass - DOMAIN OSINT"
-	git clone --quiet --recursive https://github.com/justakazh/sicat.git
-	echo "[+] downloaded sicat - EXPLOIT SEARCH"
 	git clone --quiet --recursive https://github.com/OWASP/ZSC.git
 	echo "[+] downloaded zsc - SHELLCODING"
 	git clone --quiet --recursive https://github.com/pwndbg/pwndbg.git
 	echo "[+] downloaded pwndbg - LINUX DEBUGGING"
-	echo "[!] Downloading the SecLists. This may take a moment"
+	echo -en "\n[!] Downloading the SecLists. This may take a moment\n"
 	git clone --quiet --recursive https://github.com/danielmiessler/SecLists.git
 	echo "[+] downloaded seclists - LIST OF PASSWORDS AND FUZZING"
 	git clone --quiet --recursive https://github.com/sherlock-project/sherlock.git
